@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 class User(AbstractUser):
-    avatar = models.ImageField(upload_to='uploads/%Y/%m', default=None)
+    avatar = models.ImageField(upload_to='lessons/%Y/%m', default=None)
 
 class Category(models.Model):
     name = models.CharField(max_length=100, null=False, unique=True)
@@ -32,7 +32,7 @@ class Lesson(ItemBase):
         # db_table = 'Lesson'
         ordering = ['id']
     content = models.TextField()
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True) #course del => lesson del
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True, related_name="lessons") #course del => lesson del
     tags = models.ManyToManyField('Tag', blank=True, null=True)
 
 
