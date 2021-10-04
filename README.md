@@ -4,7 +4,8 @@
 # Install
  + pip install django
  + install for database: pip install mysqlclient
- 
+ + add editor: pip install django-ckeditor
+
 
 
 # Create project
