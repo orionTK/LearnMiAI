@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from ckeditor.fields import RichTextField
 
 class User(AbstractUser):
     avatar = models.ImageField(upload_to='uploads/%Y/%m')
@@ -15,11 +16,15 @@ class Category(models.Model):
 class ItemBase(models.Model):
     class Meta:
         abstract = True
-    image = models.ImageField(upload_to='courses/%Y/%m', default=None)
+
     subject = models.CharField(max_length=255, null=False)
+    image = models.ImageField(upload_to='courses/%Y/%m', default=None)
     created_date = models.DateTimeField(auto_now_add=True)
     update_date = models.DateTimeField(auto_now=True)
     active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.subject
 
 class Course(ItemBase):
     class Meta:
@@ -29,11 +34,16 @@ class Course(ItemBase):
     # Khoa ngoai
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True) # CASCADE xoa category => course xoa theo
 
-    def __str__(self):
-        return self.name
 
 class Lesson(ItemBase):
     class Meta:
         unique_together = ('subject', 'course')
-    content = models.TextField()
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    content = RichTextField()
+    course = models.ForeignKey(Course, related_name="lessons", on_delete=models.CASCADE)
+    tags = models.ManyToManyField('Tag', related_name="lessons", blank=True, null=True)
+
+class Tag(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name
