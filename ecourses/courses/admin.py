@@ -9,11 +9,18 @@ class LessonForm(forms.ModelForm):
     class Meta:
         model = Lesson
         fields = '__all__'
+
 class LessonInline(admin.StackedInline):
+    model = Lesson
+    pk_name = 'course'
+
+# class LessonTagInline(admin.TabularInline):
+class LessonTagInline(admin.StackedInline):
     model = Lesson.tags.through
 
 class CourseAdmin(admin.ModelAdmin):
     inlines = (LessonInline, )
+
 
 class LessonAdmin(admin.ModelAdmin):
     class Media:
@@ -26,18 +33,18 @@ class LessonAdmin(admin.ModelAdmin):
     search_fields = ["subject", "created_date", "course__subject"] #co the tim tren subject of khoa ngoai
     list_filter = ["subject", "course__subject"]
     readonly_fields = ["avatar"]
-    inlines = [LessonInline, ]
+    inlines = [LessonTagInline, ]
     def avatar(self, lesson):
         return mark_safe("<img src='/static/{img_url}'/ alt='{alt}' width='120px'>".format(img_url=lesson.image.name, alt=lesson.subject))
 
+class CourseAppAdminSite(admin.AdminSite):
+    site_header = "HE THONG QUAN LY KHOA HOC"
 
-# class LessonTagInline(admin.TabularInline):
-class LessonTagInline(admin.StackedInline):
-    model = Lesson
-    pk_name = 'course'
+admin_site = CourseAppAdminSite('mycourse')
 
-
-
-admin.site.register(Category)
-admin.site.register(Course)
-admin.site.register(Lesson, LessonAdmin)
+# admin.site.register(Category)
+# admin.site.register(Course)
+# admin.site.register(Lesson, LessonAdmin)
+admin_site.register(Category)
+admin_site.register(Course)
+admin_site.register(Lesson, LessonAdmin)
