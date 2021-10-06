@@ -3,6 +3,7 @@ from django.utils.html import mark_safe
 from .models import Category, Course, Lesson, Tag
 from django import forms
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
+from django.urls import path
 
 class LessonForm(forms.ModelForm):
     content = forms.CharField(widget=CKEditorUploadingWidget)
@@ -39,6 +40,17 @@ class LessonAdmin(admin.ModelAdmin):
 
 class CourseAppAdminSite(admin.AdminSite):
     site_header = "HE THONG QUAN LY KHOA HOC"
+
+    def get_urls(self):
+        return [
+            path('/course-stats/', self.course_stats)
+        ] + super().get_urls()
+
+    def course_stats(self, request):
+        course_count = Course.objects.count()
+        return TemplateResponse(request, 'admin/course-stats.html', {
+            'course_count' :course_count
+        })
 
 admin_site = CourseAppAdminSite('mycourse')
 
