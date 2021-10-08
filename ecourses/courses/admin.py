@@ -4,6 +4,8 @@ from .models import Category, Course, Lesson, Tag
 from django import forms
 from ckeditor_uploader.widgets import CKEditorUploadingWidget
 from django.urls import path
+from django.db.models import Count
+from django.template.response import TemplateResponse
 
 class LessonForm(forms.ModelForm):
     content = forms.CharField(widget=CKEditorUploadingWidget)
@@ -48,8 +50,10 @@ class CourseAppAdminSite(admin.AdminSite):
 
     def course_stats(self, request):
         course_count = Course.objects.count()
+        stats = Course.objects.annotate(lesson_count=Count('lesssons')).values("id", "subject", "lesson_count")
         return TemplateResponse(request, 'admin/course-stats.html', {
-            'course_count' :course_count
+            'course_count' :course_count,
+            'stats' :stats
         })
 
 admin_site = CourseAppAdminSite('mycourse')
